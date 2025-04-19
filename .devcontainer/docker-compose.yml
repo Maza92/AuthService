@@ -1,0 +1,50 @@
+name: auth-service
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        GRADLE_VERSION: "${GRADLE_VERSION:-8.10.2}"
+    volumes:
+      - ../:/workspace:cached,Z
+      - gradle-cache:/home/vscode/.gradle/
+    command: sleep infinity
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      JAVA_HOME: /usr/local/sdkman/candidates/java/current
+      GRADLE_VERSION: ${GRADLE_VERSION}
+    depends_on:
+      - db
+    networks:
+      - spring-network
+
+  db:
+    container_name: postgres_db
+    image: postgres:17.2-bookworm
+    restart: unless-stopped
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    networks:
+      - spring-network
+
+networks:
+  spring-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  gradle-cache:

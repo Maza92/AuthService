@@ -1,0 +1,40 @@
+{
+  "name": "Spring Boot Dev Environment",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "vmware.vscode-spring-boot",
+        "vscjava.vscode-gradle",
+        "redhat.vscode-yaml",
+        "gabrielbb.vscode-lombok",
+        "pverest.java-ide-pack"
+      ]
+    },
+    "jetbrains": {
+      "backend": "IntelliJ"
+    }
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/java": {
+      "version": "21",
+      "installGradle": true,
+      "gradleVersion": "8.10.2"
+    }
+  },
+  "forwardPorts": [8080],
+  "postCreateCommand": "gradle wrapper && gradle build",
+  "remoteUser": "vscode",
+  "remoteEnv": {
+    "JAVA_HOME": "/usr/local/sdkman/candidates/java/current"
+  },
+  "hostRequirements": {
+    "memory": "8gb"
+  },
+  "otherPortsAttributes": {
+    "onAutoForward": "ignore"
+  }
+}
