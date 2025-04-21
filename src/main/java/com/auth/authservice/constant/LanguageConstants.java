@@ -15,7 +15,7 @@ public final class LanguageConstants {
 			"classpath:validation/validation",
 			"classpath:api/api-doc");
 
-	public static List<String> getMessageSources() {
-		return MESSAGE_SOURCES;
+	public static String[] getMessageSources() {
+		return MESSAGE_SOURCES.toArray(new String[0]);
 	}
 }

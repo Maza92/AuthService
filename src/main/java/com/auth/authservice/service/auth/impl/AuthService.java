@@ -1,26 +1,26 @@
 package com.auth.authservice.service.auth.impl;
 
-import java.util.Collections;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.auth.authservice.dto.LoginRequest;
-import com.auth.authservice.dto.LoginResponse;
-import com.auth.authservice.dto.RegisterRequest;
+import com.auth.authservice.dto.LoginRequestDto;
+import com.auth.authservice.dto.LoginResponseDto;
+import com.auth.authservice.dto.RegisterRequestDto;
 import com.auth.authservice.entity.RoleEntity;
 import com.auth.authservice.entity.UserEntity;
 import com.auth.authservice.enums.RoleEnum;
 import com.auth.authservice.exception.ApiExceptionFactory;
 import com.auth.authservice.repository.RoleRepository;
 import com.auth.authservice.repository.UserRepository;
+import com.auth.authservice.service.auth.IAuthService;
 import com.auth.authservice.service.token.IJwtTokenService;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class AuthService {
+public class AuthService implements IAuthService {
 
 	private final UserRepository userRepository;
 	private final RoleRepository roleRepository;
@@ -28,7 +28,8 @@ public class AuthService {
 	private final IJwtTokenService jwtTokenService;
 	private final ApiExceptionFactory apiExceptionFactory;
 
-	public LoginResponse login(LoginRequest request) {
+	@Override
+	public LoginResponseDto login(LoginRequestDto request) {
 		UserEntity user = userRepository.findByEmail(request.getEmail())
 				.orElseThrow(() -> apiExceptionFactory.authException("auth.invalid.credentials"));
 
@@ -38,24 +39,28 @@ public class AuthService {
 
 		String token = jwtTokenService.generateToken(user);
 
-		return new LoginResponse(token);
+		return new LoginResponseDto(token);
 	}
 
-	public void register(RegisterRequest request) {
+	@Transactional
+	@Override
+	public void register(RegisterRequestDto request) {
 		if (userRepository.existsByEmail(request.getEmail())) {
-			throw apiExceptionFactory.businessException("auth.email.exists");
+			throw apiExceptionFactory.conflictException("auth.email.exists");
 		}
 
-		UserEntity user = new UserEntity();
-		user.setEmail(request.getEmail());
-		user.setPassword(passwordEncoder.encode(request.getPassword()));
-		user.setFirstName(request.getFirstName());
-		user.setLastName(request.getLastName());
-		user.setActive(true);
+		UserEntity user = new UserEntity()
+				.setEmail(request.getEmail())
+				.setPassword(passwordEncoder.encode(request.getPassword()))
+				.setUsername(request.getUserName())
+				.setFirstName(request.getFirstName())
+				.setLastName(request.getLastName())
+				.setActive(true);
 
-		RoleEntity userRole = roleRepository.findByName(RoleEnum.USER.name())
-				.orElseThrow(() -> apiExceptionFactory.entityNotFound("role", RoleEnum.USER.name()));
-		user.setRoles(Collections.singleton(userRole));
+		RoleEntity userRole = roleRepository.findByName(RoleEnum.USER)
+				.orElseThrow(() -> apiExceptionFactory.entityNotFoundGeneric("role", RoleEnum.USER));
+
+		user.setRole(userRole);
 
 		userRepository.save(user);
 	}

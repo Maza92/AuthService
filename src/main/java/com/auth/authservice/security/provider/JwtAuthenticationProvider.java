@@ -1,7 +1,7 @@
 package com.auth.authservice.security.provider;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -42,9 +42,8 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
 			throw apiExceptionFactory.authException("auth.user.inactive");
 		}
 
-		List<GrantedAuthority> authorities = user.getRoles().stream()
-				.map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
-				.collect(Collectors.toList());
+		List<GrantedAuthority> authorities = Collections
+				.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole().getName()));
 
 		return new JwtAuthenticationToken(
 				(String) authToken.getCredentials(),

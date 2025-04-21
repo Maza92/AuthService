@@ -31,7 +31,7 @@ public class JwtKeyServiceImpl implements IJwtKeyService {
 		} catch (IllegalArgumentException e) {
 			throw this.apiExceptionFactory.authException("auth.token.key.error", e.getMessage());
 		} catch (Exception e) {
-			throw this.apiExceptionFactory.authException("auth.token.key.error", e.getMessage());
+			throw this.apiExceptionFactory.authException("exception.unexpected", e.getMessage());
 		}
 	}
 

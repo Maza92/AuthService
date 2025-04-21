@@ -12,6 +12,7 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -59,6 +60,8 @@ public class UserEntity extends BaseAuditEntity {
 	@Column(name = "active", nullable = false)
 	private boolean active;
 
-	@ManyToMany
-	private Set<RoleEntity> roles;
+	@NotNull
+	@ManyToOne
+	@JoinColumn(name = "role_id", nullable = false)
+	private RoleEntity role;
 }

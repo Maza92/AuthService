@@ -1,12 +1,10 @@
 package com.auth.authservice.service.token.impl;
 
 import java.util.Date;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.auth.authservice.entity.RoleEntity;
 import com.auth.authservice.entity.UserEntity;
 import com.auth.authservice.service.token.IJwtTokenService;
 import com.auth.authservice.service.token.key.IJwtKeyService;
@@ -34,9 +32,7 @@ public class JwtTokenServiceImpl implements IJwtTokenService {
 		return Jwts.builder()
 				.subject(user.getId().toString())
 				.claim("email", user.getEmail())
-				.claim("roles", user.getRoles().stream()
-						.map(RoleEntity::getName)
-						.collect(Collectors.toList()))
+				.claim("role", user.getRole())
 				.issuedAt(now)
 				.expiration(expiration)
 				.signWith(jwtKeyService.generateKey())
