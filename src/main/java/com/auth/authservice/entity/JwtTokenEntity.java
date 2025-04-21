@@ -51,33 +51,14 @@ public class JwtTokenEntity extends BaseAuditEntity {
 	@Column(name = "expiry_date", nullable = false)
 	private Instant expiry;
 
-	@Enumerated(EnumType.STRING)
-	@Column(name = "token_status", nullable = false)
-	private TokenEnum tokenStatus;
-
 	@Column(name = "revoked_at")
 	private Instant revokedAt;
-
-	@Column(name = "revoked_by")
-	private String revokedReason;
 
 	@Column(name = "refresh_count")
 	private Integer refreshCount = 0;
 
 	@Column(name = "last_refresh_at")
 	private Instant lastRefreshAt;
-
-	@Column(name = "previous_token")
-	private String previousToken;
-
-	@Column(name = "usage_count")
-	private Integer usageCount = 0;
-
-	@Column(name = "last_access_at")
-	private Instant lastAccessAt;
-
-	@Column(name = "last_operation")
-	private String lastOperation;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "user_id", nullable = false)

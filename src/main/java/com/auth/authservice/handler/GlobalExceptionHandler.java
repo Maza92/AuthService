@@ -14,9 +14,11 @@ import com.auth.authservice.exception.exceptions.AuthException;
 import com.auth.authservice.exception.exceptions.BusinessException;
 import com.auth.authservice.exception.exceptions.EntityException;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 
 @RestControllerAdvice
+@Hidden
 @RequiredArgsConstructor
 public class GlobalExceptionHandler {
 	private final MessageSource messageSource;

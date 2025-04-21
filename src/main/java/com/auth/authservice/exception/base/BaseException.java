@@ -2,6 +2,8 @@ package com.auth.authservice.exception.base;
 
 import java.util.Locale;
 
+import org.springframework.context.MessageSource;
+
 import lombok.Getter;
 
 @Getter
@@ -14,5 +16,9 @@ public abstract class BaseException extends RuntimeException {
 		this.messageKey = messageKey;
 		this.locale = locale;
 		this.args = args;
+	}
+
+	public String getResolvedMessage(MessageSource messageSource) {
+		return messageSource.getMessage(messageKey, args, locale);
 	}
 }

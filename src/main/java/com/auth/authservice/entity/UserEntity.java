@@ -1,11 +1,14 @@
 package com.auth.authservice.entity;
 
+import java.util.Set;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
@@ -53,7 +56,9 @@ public class UserEntity extends BaseAuditEntity {
 	@Column(name = "profile_image_path", length = Integer.MAX_VALUE)
 	private String profileImagePath;
 
-	@ManyToOne(optional = false)
-	@JoinColumn(name = "role_id", nullable = false)
-	private RoleEntity role;
+	@Column(name = "active", nullable = false)
+	private boolean active;
+
+	@ManyToMany
+	private Set<RoleEntity> roles;
 }
