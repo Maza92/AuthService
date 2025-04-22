@@ -24,8 +24,19 @@ public class JwtTokenServiceImpl implements IJwtTokenService {
 	@Value("${security.jwt.expiration-ms-time}")
 	private long expirationTime;
 
+	@Value("${security.jwt.expiration-refresh-ms-time}")
+	private long refreshExpirationTime;
+
 	@Override
 	public String generateToken(UserEntity user) {
+		return generateToken(user, expirationTime);
+	}
+
+	private String generateRefreshToken(UserEntity user) {
+		return generateToken(user, refreshExpirationTime);
+	}
+
+	private String generateToken(UserEntity user, Long expirationTime) {
 		Date now = new Date();
 		Date expiration = new Date(now.getTime() + expirationTime);
 
