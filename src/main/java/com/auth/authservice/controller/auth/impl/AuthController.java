@@ -23,8 +23,7 @@ public class AuthController implements IAuthController {
 
 	private final IAuthService authService;
 
-	@PostMapping("/login")
-	public ResponseEntity<LoginResponseDto> login(@RequestBody @Valid LoginRequestDto request) {
+	public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginRequestDto request) {
 		return ResponseEntity.ok(authService.login(request));
 	}
 

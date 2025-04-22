@@ -21,7 +21,7 @@ public class JwtTokenServiceImpl implements IJwtTokenService {
 	private final IJwtKeyService jwtKeyService;
 	private final JwtParser jwtParser;
 
-	@Value("${security.jwt.expiration-time}")
+	@Value("${security.jwt.expiration-ms-time}")
 	private long expirationTime;
 
 	@Override
