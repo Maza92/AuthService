@@ -7,6 +7,10 @@ import io.jsonwebtoken.Claims;
 public interface IJwtTokenService {
 	String generateToken(UserEntity user);
 
+	String generateRefreshToken(UserEntity user);
+
+	void revokeToken(String token);
+
 	boolean validateToken(String token);
 
 	Claims getClaims(String token);

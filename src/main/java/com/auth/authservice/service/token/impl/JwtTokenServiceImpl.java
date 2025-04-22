@@ -5,7 +5,9 @@ import java.util.Date;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.auth.authservice.entity.JwtTokenEntity;
 import com.auth.authservice.entity.UserEntity;
+import com.auth.authservice.repository.JwtRepository;
 import com.auth.authservice.service.token.IJwtTokenService;
 import com.auth.authservice.service.token.key.IJwtKeyService;
 
@@ -20,6 +22,7 @@ public class JwtTokenServiceImpl implements IJwtTokenService {
 
 	private final IJwtKeyService jwtKeyService;
 	private final JwtParser jwtParser;
+	private final JwtRepository jwtRepository;
 
 	@Value("${security.jwt.expiration-ms-time}")
 	private long expirationTime;
@@ -32,7 +35,8 @@ public class JwtTokenServiceImpl implements IJwtTokenService {
 		return generateToken(user, expirationTime);
 	}
 
-	private String generateRefreshToken(UserEntity user) {
+	@Override
+	public String generateRefreshToken(UserEntity user) {
 		return generateToken(user, refreshExpirationTime);
 	}
 
@@ -40,7 +44,7 @@ public class JwtTokenServiceImpl implements IJwtTokenService {
 		Date now = new Date();
 		Date expiration = new Date(now.getTime() + expirationTime);
 
-		return Jwts.builder()
+		String token = Jwts.builder()
 				.subject(user.getId().toString())
 				.claim("email", user.getEmail())
 				.claim("role", user.getRole())
@@ -48,6 +52,31 @@ public class JwtTokenServiceImpl implements IJwtTokenService {
 				.expiration(expiration)
 				.signWith(jwtKeyService.generateKey())
 				.compact();
+
+		jwtRepository.save(new JwtTokenEntity().setToken(token)
+				.setUserEntity(user)
+				.setValid(true)
+				.setRevoked(false)
+				.setExpiry(expiration.toInstant())
+				.setJti(token));
+
+		return token;
+	}
+
+	@Override
+	public void revokeToken(String token) {
+		JwtTokenEntity jwtToken = jwtRepository
+				.findByUserEntity_IdAndIsRevokedFalseAndIsValidTrue(Long.parseLong(token))
+				.stream()
+				.filter(t -> t.getToken().equals(token))
+				.findFirst()
+				.orElse(null);
+
+		if (jwtToken != null) {
+			jwtToken.setRevoked(true);
+			jwtToken.setRevokedAt(new Date().toInstant());
+			jwtRepository.save(jwtToken);
+		}
 	}
 
 	@Override

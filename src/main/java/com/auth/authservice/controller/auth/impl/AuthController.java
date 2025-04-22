@@ -23,6 +23,7 @@ public class AuthController implements IAuthController {
 
 	private final IAuthService authService;
 
+	@Override
 	public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginRequestDto request) {
 		return ResponseEntity.ok(authService.login(request));
 	}
