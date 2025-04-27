@@ -43,7 +43,7 @@ public class GlobalExceptionHandler {
 		String message = messageSource.getMessage(
 				"validation.error",
 				null,
-				"Error de validación",
+				"exception.validation.error",
 				LocaleContextHolder.getLocale());
 
 		return ResponseEntity
