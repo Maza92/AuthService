@@ -41,9 +41,9 @@ public class GlobalExceptionHandler {
 				.toList();
 
 		String message = messageSource.getMessage(
-				"validation.error",
-				null,
 				"exception.validation.error",
+				null,
+				"exception.unexpected",
 				LocaleContextHolder.getLocale());
 
 		return ResponseEntity
@@ -80,7 +80,7 @@ public class GlobalExceptionHandler {
 		String message = messageSource.getMessage(
 				"exception.unexpected",
 				null,
-				"Error inesperado",
+				"exception.unexpected",
 				LocaleContextHolder.getLocale());
 
 		return ResponseEntity
