@@ -49,7 +49,7 @@ public class AuthService implements IAuthService {
 		}
 
 		if (jwtRepository
-				.countByUserEntity_IdAndIsRevokedFalseAndIsValidTrue(user.getId().longValue()) >= MAX_JWT_COUNT) {
+				.countActiveTokensByUser(user.getId().longValue()) >= MAX_JWT_COUNT) {
 			throw apiExceptionFactory.authException("auth.max.jwt.count");
 		}
 
@@ -85,4 +85,5 @@ public class AuthService implements IAuthService {
 
 		userRepository.save(user);
 	}
+
 }

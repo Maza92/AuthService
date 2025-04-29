@@ -34,4 +34,19 @@ public class AuthController implements IAuthController {
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
+	public ResponseEntity<Void> logout() {
+		return ResponseEntity.ok().build();
+	}
+
+	public ResponseEntity<Void> refreshToken() {
+		return ResponseEntity.ok().build();
+	}
+
+	public ResponseEntity<Void> forgotPassword() {
+		return ResponseEntity.ok().build();
+	}
+
+	public ResponseEntity<Void> resetPassword() {
+		return ResponseEntity.ok().build();
+	}
 }

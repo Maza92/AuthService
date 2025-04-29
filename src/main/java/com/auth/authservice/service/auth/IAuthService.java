@@ -8,4 +8,5 @@ public interface IAuthService {
 	LoginResponseDto login(LoginRequestDto request);
 
 	void register(RegisterRequestDto request);
+
 }

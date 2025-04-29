@@ -66,7 +66,7 @@ public class JwtTokenServiceImpl implements IJwtTokenService {
 	@Override
 	public void revokeToken(String token) {
 		JwtTokenEntity jwtToken = jwtRepository
-				.findByUserEntity_IdAndIsRevokedFalseAndIsValidTrue(Long.parseLong(token))
+				.findActiveTokensByUser(Long.parseLong(token))
 				.stream()
 				.filter(t -> t.getToken().equals(token))
 				.findFirst()
