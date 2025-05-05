@@ -2,7 +2,6 @@ package com.auth.authservice.controller.auth.impl;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -10,9 +9,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.auth.authservice.controller.auth.IAuthController;
 import com.auth.authservice.dto.LoginRequestDto;
 import com.auth.authservice.dto.LoginResponseDto;
+import com.auth.authservice.dto.RefreshRequestDto;
+import com.auth.authservice.dto.RefreshResponseDto;
 import com.auth.authservice.dto.RegisterRequestDto;
 import com.auth.authservice.service.auth.IAuthService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -34,12 +36,15 @@ public class AuthController implements IAuthController {
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
-	public ResponseEntity<Void> logout() {
+	@Override
+	public ResponseEntity<Void> logout(HttpServletRequest request) {
+		authService.logout(request);
 		return ResponseEntity.ok().build();
 	}
 
-	public ResponseEntity<Void> refreshToken() {
-		return ResponseEntity.ok().build();
+	@Override
+	public ResponseEntity<RefreshResponseDto> refreshToken(@Valid @RequestBody RefreshRequestDto refreshToken) {
+		return ResponseEntity.ok(authService.refreshToken(refreshToken));
 	}
 
 	public ResponseEntity<Void> forgotPassword() {

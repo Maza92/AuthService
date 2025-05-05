@@ -8,8 +8,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.auth.authservice.exception.ApiExceptionFactory;
+import com.auth.authservice.repository.JwtRepository;
 import com.auth.authservice.security.object.JwtAuthenticationToken;
 import com.auth.authservice.security.provider.JwtAuthenticationProvider;
+import com.auth.authservice.service.token.IJwtTokenService;
+import com.auth.authservice.service.token.validator.ITokenValidationService;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtParser;
@@ -23,9 +26,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-	private final JwtParser jwtParser;
-	private final ApiExceptionFactory apiExceptionFactory;
 	private final JwtAuthenticationProvider authenticationProvider;
+	private final IJwtTokenService jwtTokenService;
+	private final ITokenValidationService tokenValidationService;
 
 	@Override
 	protected void doFilterInternal(
@@ -33,16 +36,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			HttpServletResponse response,
 			FilterChain filterChain) throws ServletException, IOException {
 
-		String authHeader = request.getHeader("Authorization");
+		String token = this.jwtTokenService.extractTokenHeader(request);
 
-		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+		if (token == null) {
 			filterChain.doFilter(request, response);
 			return;
 		}
 
 		try {
-			String token = authHeader.substring(7);
-			Claims claims = extractClaims(token);
+			Claims claims = tokenValidationService.validateToken(token);
 
 			JwtAuthenticationToken authentication = new JwtAuthenticationToken(token, claims);
 
@@ -54,13 +56,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		}
 
 		filterChain.doFilter(request, response);
-	}
-
-	private Claims extractClaims(String token) {
-		try {
-			return jwtParser.parseSignedClaims(token).getPayload();
-		} catch (Exception e) {
-			throw apiExceptionFactory.authException("auth.token.invalid");
-		}
 	}
 }

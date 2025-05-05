@@ -3,6 +3,7 @@ package com.auth.authservice.entity;
 import java.time.Instant;
 
 import com.auth.authservice.enums.TokenEnum;
+import com.auth.authservice.enums.TokenTypeEnum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -41,6 +42,10 @@ public class JwtTokenEntity extends BaseAuditEntity {
 
 	@Column(name = "token", nullable = false, length = Integer.MAX_VALUE)
 	private String token;
+
+	@Column(name = "token_type", nullable = false)
+	@Enumerated(EnumType.STRING)
+	private TokenTypeEnum tokenType;
 
 	@Column(name = "is_valid", nullable = false)
 	private boolean isValid;
