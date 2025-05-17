@@ -7,11 +7,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.auth.authservice.controller.auth.IAuthController;
+import com.auth.authservice.dto.ForgotPasswordDto;
 import com.auth.authservice.dto.LoginRequestDto;
 import com.auth.authservice.dto.LoginResponseDto;
 import com.auth.authservice.dto.RefreshRequestDto;
 import com.auth.authservice.dto.RefreshResponseDto;
 import com.auth.authservice.dto.RegisterRequestDto;
+import com.auth.authservice.dto.ResetPasswordDto;
 import com.auth.authservice.service.auth.IAuthService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -47,11 +49,11 @@ public class AuthController implements IAuthController {
 		return ResponseEntity.ok(authService.refreshToken(refreshToken));
 	}
 
-	public ResponseEntity<Void> forgotPassword() {
+	public ResponseEntity<Void> forgotPassword(ForgotPasswordDto request) {
 		return ResponseEntity.ok().build();
 	}
 
-	public ResponseEntity<Void> resetPassword() {
+	public ResponseEntity<Void> resetPassword(ResetPasswordDto request) {
 		return ResponseEntity.ok().build();
 	}
 }

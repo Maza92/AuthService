@@ -6,11 +6,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.auth.authservice.dto.ApiErrorDto;
+import com.auth.authservice.dto.ForgotPasswordDto;
 import com.auth.authservice.dto.LoginRequestDto;
 import com.auth.authservice.dto.LoginResponseDto;
 import com.auth.authservice.dto.RefreshRequestDto;
 import com.auth.authservice.dto.RefreshResponseDto;
 import com.auth.authservice.dto.RegisterRequestDto;
+import com.auth.authservice.dto.ResetPasswordDto;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -70,6 +72,7 @@ public interface IAuthController {
 						"errors": []
 					}
 					""") }))
+	@Parameter(name = "Accept-Language", in = ParameterIn.HEADER, required = true, description = "Language code (e.g., 'en' for English, 'es' for Spanish)", example = "en", schema = @Schema(type = "string", defaultValue = "en"))
 	ResponseEntity<LoginResponseDto> login(LoginRequestDto request);
 
 	@PostMapping("/register")
@@ -150,4 +153,12 @@ public interface IAuthController {
 	@Parameter(name = "Accept-Language", in = ParameterIn.HEADER, required = true, description = "Language code (e.g., 'en' for English, 'es' for Spanish)", example = "en", schema = @Schema(type = "string", defaultValue = "en"))
 	ResponseEntity<RefreshResponseDto> refreshToken(
 			@Parameter(description = "Refresh token request") @Valid @RequestBody RefreshRequestDto refreshRequest);
+
+	@PostMapping("/forgot-password")
+	ResponseEntity<Void> forgotPassword(
+			@Parameter(description = "Forgot password request") @Valid @RequestBody ForgotPasswordDto request);
+
+	@PostMapping("/reset-password")
+	ResponseEntity<Void> resetPassword(
+			@Parameter(description = "Reset password request") @Valid @RequestBody ResetPasswordDto request);
 }
