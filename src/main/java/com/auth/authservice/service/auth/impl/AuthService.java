@@ -35,6 +35,7 @@ import com.auth.authservice.service.email.EmailService;
 import com.auth.authservice.service.email.EmailTemplateService;
 import com.auth.authservice.service.token.IJwtTokenService;
 import com.auth.authservice.service.token.validator.ITokenValidationService;
+import com.auth.authservice.utils.MessageUtils;
 
 import io.jsonwebtoken.Claims;
 import jakarta.mail.MessagingException;
@@ -56,6 +57,7 @@ public class AuthService implements IAuthService {
 	private final ITokenValidationService tokenValidationService;
 	private final EmailTemplateService emailTemplateService;
 	private final EmailService emailService;
+	private final MessageUtils messageUtils;
 
 	@Value("${security.jwt.max-jwt-count}")
 	int MAX_JWT_COUNT;
@@ -132,9 +134,12 @@ public class AuthService implements IAuthService {
 	}
 
 	@Override
+	@Transactional
 	public void forgotPassword(ForgotPasswordDto request) {
 		UserEntity user = userRepository.findByEmail(request.getEmail())
 				.orElseThrow(() -> apiExceptionFactory.entityNotFoundGeneric("user", request.getEmail()));
+
+		resetCodeRepository.invalidateAllUserCodes(user.getId());
 
 		String verificationCode = generateVerificationCode();
 
@@ -149,7 +154,7 @@ public class AuthService implements IAuthService {
 		try {
 			emailService.sendHtmlEmail(
 					user.getEmail(),
-					"Recuperación de Contraseña",
+					messageUtils.getMessage("email.password.reset.subject"),
 					htmlContent);
 
 			ResetCodeEntity resetCode = new ResetCodeEntity()
@@ -169,31 +174,37 @@ public class AuthService implements IAuthService {
 		UserEntity user = userRepository.findByEmail(request.getEmail())
 				.orElseThrow(() -> apiExceptionFactory.entityNotFoundGeneric("user", request.getEmail()));
 
-		ResetCodeEntity code = resetCodeRepository
-				.findValidCodeByUserAndCode(request.getCode(), user, Instant.now())
-				.orElseThrow(() -> apiExceptionFactory.entityNotFoundGeneric("resetCode", request.getCode()));
-
-		if (code.getAttempts() >= MAX_RESET_CODE_ATTEMPTS) {
-			throw apiExceptionFactory.authException("resetCode.too.many.attempts");
+		ResetCodeEntity code;
+		try {
+			code = resetCodeRepository
+					.findCodeByUserAndCode(request.getCode(), user.getId())
+					.orElseThrow(() -> apiExceptionFactory.businessException("auth.reset.code.invalid"));
+		} catch (Exception e) {
+			throw apiExceptionFactory.businessException("auth.reset.code.invalid");
 		}
+
+		if (code.getExpiresAt().isBefore(Instant.now()))
+			throw apiExceptionFactory.businessException("auth.reset.code.expired");
+
+		if (code.getAttempts() >= MAX_RESET_CODE_ATTEMPTS)
+			throw apiExceptionFactory.authException("resetCode.too.many.attempts");
 
 		code.setAttempts(code.getAttempts() + 1);
 		code.setUsed(true);
 		resetCodeRepository.save(code);
-
 		return jwtTokenService.generatePasswordResetToken(user);
 	}
 
 	@Override
+	@Transactional
 	public void recoverPassword(RecoverPasswordDto request) {
 		Claims claims = tokenValidationService.validateResetToken(request.getResetToken());
 
 		String userId = claims.getSubject();
 		UserEntity user = userRepository.findById(Long.valueOf(userId))
 				.orElseThrow(() -> apiExceptionFactory.entityNotFoundGeneric("user", userId));
-
+		jwtRepository.revokeToken(request.getResetToken());
 		user.setPassword(passwordEncoder.encode(request.getNewPassword()));
-
 		userRepository.save(user);
 	}
 

@@ -1,9 +1,11 @@
 package com.auth.authservice.repository;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -32,11 +34,25 @@ public interface JwtRepository extends JpaRepository<JwtTokenEntity, Integer> {
 	boolean isValid(@Param("token") String token);
 
 	@Query("UPDATE JwtTokenEntity j SET j.isRevoked = true WHERE j.token = :token")
+	@Modifying
 	void revokeToken(@Param("token") String token);
 
 	@Query("UPDATE JwtTokenEntity j SET j.isValid = false WHERE j.token = :token")
+	@Modifying
 	void invalidateToken(@Param("token") String token);
 
 	@Query("SELECT COUNT(j) > 0 FROM JwtTokenEntity j WHERE j.token = :token AND j.tokenType = :tokenType")
 	boolean isTokenType(@Param("token") String token, @Param("tokenType") TokenTypeEnum tokenType);
+
+	@Query("DELETE FROM JwtTokenEntity j WHERE j.expiry < :now")
+	@Modifying
+	int deleteExpiredTokens(@Param("now") Instant now);
+
+	@Query("DELETE FROM JwtTokenEntity j WHERE j.isRevoked = true")
+	@Modifying
+	int deleteRevokedTokens();
+
+	@Query("DELETE FROM JwtTokenEntity j WHERE j.isValid = false OR j.isRevoked = true OR j.expiry < :now")
+	@Modifying
+	int deleteInactiveTokens(@Param("now") Instant now);
 }

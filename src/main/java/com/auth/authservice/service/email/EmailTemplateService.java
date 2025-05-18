@@ -19,20 +19,7 @@ public class EmailTemplateService {
     public String generateEmailContent(String template, Map<String, Object> variables) {
         Context context = new Context();
         variables.forEach(context::setVariable);
-        
-        return templateEngine.process(template, context);
-    }
 
-    public static TemplateEngine createTemplateEngine() {
-        ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
-        templateResolver.setPrefix("/templates/email/");
-        templateResolver.setSuffix(".html");
-        templateResolver.setTemplateMode("HTML");
-        templateResolver.setCharacterEncoding("UTF-8");
-        
-        SpringTemplateEngine engine = new SpringTemplateEngine();
-        engine.setTemplateResolver(templateResolver);
-        
-        return engine;
+        return templateEngine.process(template, context);
     }
 }

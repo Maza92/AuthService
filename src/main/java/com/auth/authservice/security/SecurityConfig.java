@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.auth.authservice.constant.SecurityConstants;
 import com.auth.authservice.security.filter.JwtAuthenticationFilter;
 
 import lombok.RequiredArgsConstructor;
@@ -29,8 +30,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/login", "/api/auth/register", "/swagger-ui/**",
-                                "/v3/api-docs/**", "/api/auth/refresh-token", "/api/auth/forgot-password")
+                        .requestMatchers(SecurityConstants.getPublicEndpoints())
                         .permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

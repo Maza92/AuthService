@@ -52,4 +52,8 @@ public class ResetCodeEntity extends BaseAuditEntity {
 	@ManyToOne
 	@JoinColumn(name = "user_id", nullable = false)
 	private UserEntity user;
+
+	public boolean isUsed() {
+		return Boolean.TRUE.equals(used);
+	}
 }

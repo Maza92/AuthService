@@ -2,6 +2,7 @@ package com.auth.authservice.service.token.impl;
 
 import java.time.Instant;
 import java.util.Date;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -38,22 +39,40 @@ public class JwtTokenServiceImpl implements IJwtTokenService {
 	@Value("${security.jwt.expiration-refresh-ms-time}")
 	private long refreshExpirationTime;
 
+	@Value("${security.jwt.password-reset-expiration}")
+	private Long passwordResetExpiration;
+
 	@Value("${security.jwt.max-refresh-count}")
 	private int maxRefreshCount;
 
-	@Value("${security.jwt.password-reset-expiration}")
-	private int passwordResetExpiration;
-
 	@Override
 	public String generateToken(UserEntity user) {
-		return generateToken(user, expirationTime, TokenTypeEnum.ACCESS);
+		return generateToken(user, expirationTime, TokenTypeEnum.ACCESS,
+				Map.of("email", user.getEmail(),
+						"role", user.getRole()));
 	}
 
 	@Override
 	public String generateRefreshToken(UserEntity user) {
-		return generateToken(user, refreshExpirationTime, TokenTypeEnum.REFRESH);
+		return generateToken(user, refreshExpirationTime, TokenTypeEnum.REFRESH,
+				Map.of("email", user.getEmail(),
+						"role", user.getRole()));
 	}
 
+	@Override
+	public String generateResetToken(UserEntity user) {
+		return generateToken(user, passwordResetExpiration, TokenTypeEnum.RESET,
+				Map.of("type", TokenTypeEnum.RESET.name()));
+	}
+
+	@Override
+	public ResetTokenDto generatePasswordResetToken(UserEntity user) {
+		String token = generateResetToken(user);
+		return new ResetTokenDto()
+				.setResetToken(token);
+	}
+
+	@Override
 	public LoginResponseDto generateLoginUserTokens(UserEntity user) {
 		String token = generateToken(user);
 		String refreshToken = generateRefreshToken(user);
@@ -64,6 +83,7 @@ public class JwtTokenServiceImpl implements IJwtTokenService {
 				.setUsername(user.getUsername());
 	}
 
+	@Override
 	public RefreshResponseDto generateRefreshUserTokens(UserEntity user, String oldRefreshToken) {
 
 		JwtTokenEntity refreshTokenEntity = jwtRepository
@@ -86,34 +106,22 @@ public class JwtTokenServiceImpl implements IJwtTokenService {
 				.setExpiration(getClaims(token).getExpiration().toInstant());
 	}
 
-	public ResetTokenDto generatePasswordResetToken(UserEntity user) {
-		Date now = new Date();
-		Date expiration = new Date(now.getTime() + passwordResetExpiration);
-
-		String resetToken = Jwts.builder()
-				.subject(user.getId().toString())
-				.claim("email", user.getEmail())
-				.claim("type", "PASSWORD_RESET")
-				.issuedAt(now)
-				.expiration(expiration)
-				.signWith(jwtKeyService.generateKey())
-				.compact();
-
-		return new ResetTokenDto()
-				.setResetToken(resetToken);
-	}
-
-	private String generateToken(UserEntity user, Long expirationTime, TokenTypeEnum tokenType) {
+	private String generateToken(UserEntity user, Long expirationTime, TokenTypeEnum tokenType,
+			Map<String, Object> additionalClaims) {
 		Date now = new Date();
 		Date expiration = new Date(now.getTime() + expirationTime);
 
-		String token = Jwts.builder()
+		var jwtBuilder = Jwts.builder()
 				.subject(user.getId().toString())
-				.claim("email", user.getEmail())
-				.claim("role", user.getRole())
+				.claim("username", user.getUsername())
 				.issuedAt(now)
-				.expiration(expiration)
-				.signWith(jwtKeyService.generateKey())
+				.expiration(expiration);
+
+		if (additionalClaims != null && !additionalClaims.isEmpty()) {
+			additionalClaims.forEach(jwtBuilder::claim);
+		}
+
+		String token = jwtBuilder.signWith(jwtKeyService.generateKey())
 				.compact();
 
 		jwtRepository.save(new JwtTokenEntity().setToken(token)

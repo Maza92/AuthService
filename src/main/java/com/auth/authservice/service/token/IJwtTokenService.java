@@ -13,6 +13,8 @@ public interface IJwtTokenService {
 
 	String generateRefreshToken(UserEntity user);
 
+	String generateResetToken(UserEntity user);
+
 	LoginResponseDto generateLoginUserTokens(UserEntity user);
 
 	RefreshResponseDto generateRefreshUserTokens(UserEntity user, String refreshToken);

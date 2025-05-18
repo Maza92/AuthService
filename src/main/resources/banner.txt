@@ -1,0 +1,8 @@
+
+
+╔═════════════════════════════╗
+║  Auth Service API           ║
+║  Spring Boot ${spring-boot.version}          ║
+║  Java ${java.version}                ║
+╚═════════════════════════════╝
+
