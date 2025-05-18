@@ -13,6 +13,10 @@ Este proyecto es un servicio de autenticación robusto desarrollado con Spring B
 - Limitación de tasa (rate limiting) para prevenir ataques de fuerza bruta
 - Configuración CORS para seguridad en aplicaciones web
 - Documentación API con Swagger/OpenAPI
+- Sistema de recuperación de contraseña mediante correo electrónico
+- Verificación de códigos de recuperación con límite de intentos
+- Plantillas de correo electrónico personalizables
+- Gestión de tokens de restablecimiento de contraseña
 
 ## Tecnologías Utilizadas
 
@@ -23,6 +27,8 @@ Este proyecto es un servicio de autenticación robusto desarrollado con Spring B
 - **Hibernate 6.5.2** - Como implementación de JPA
 - **PostgreSQL** - Como base de datos relacional
 - **JWT (JSON Web Tokens)** - Para la gestión de tokens de autenticación
+- **Spring Mail** - Para el envío de correos electrónicos
+- **Thymeleaf** - Para plantillas de correo electrónico
 - **Lombok** - Para reducir código boilerplate
 - **Gradle** - Como sistema de construcción
 - **Docker** - Para la contenerización de la aplicación
@@ -89,6 +95,10 @@ http://localhost:8080/api/v1/swagger-ui.html
 - **POST /auth/login** - Autenticación y obtención de tokens
 - **POST /auth/refresh** - Renovación de tokens de acceso
 - **POST /auth/logout** - Cierre de sesión (revocación de tokens)
+- **POST /auth/forgot-password** - Solicitud de recuperación de contraseña
+- **POST /auth/verify-reset-code** - Verificación del código de recuperación
+- **POST /auth/recover-password** - Establecer nueva contraseña con token de recuperación
+- **POST /auth/reset-password** - Cambio de contraseña (usuario autenticado)
 - **GET /users/me** - Obtener información del usuario actual
 
 ## Seguridad
@@ -100,6 +110,10 @@ El servicio implementa varias capas de seguridad:
 - Limitación de tasa para prevenir ataques
 - Validación de entradas
 - Configuración CORS para aplicaciones web
+- Límite de intentos para códigos de recuperación
+- Tokens de recuperación con tiempo de expiración
+- Validación de tokens en múltiples niveles
+- Control de sesiones activas por usuario
 
 ## Desarrollo
 
