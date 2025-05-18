@@ -44,6 +44,10 @@ public class TokenValidationService implements ITokenValidationService {
 		return claims;
 	}
 
+	public Claims validateResetToken(String token) {
+		return validateToken(token);
+	}
+
 	public Claims validateRefreshToken(String token) {
 		Claims claims = validateToken(token);
 

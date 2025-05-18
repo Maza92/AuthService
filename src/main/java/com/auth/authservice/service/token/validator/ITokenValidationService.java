@@ -7,5 +7,7 @@ public interface ITokenValidationService {
 
 	Claims validateRefreshToken(String token);
 
+	Claims validateResetToken(String token);
+
 	Claims extractClaims(String token);
 }

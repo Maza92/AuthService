@@ -4,11 +4,11 @@ import java.time.Instant;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties.Jwt;
 import org.springframework.stereotype.Service;
 
 import com.auth.authservice.dto.LoginResponseDto;
 import com.auth.authservice.dto.RefreshResponseDto;
+import com.auth.authservice.dto.ResetTokenDto;
 import com.auth.authservice.entity.JwtTokenEntity;
 import com.auth.authservice.entity.UserEntity;
 import com.auth.authservice.enums.TokenTypeEnum;
@@ -40,6 +40,9 @@ public class JwtTokenServiceImpl implements IJwtTokenService {
 
 	@Value("${security.jwt.max-refresh-count}")
 	private int maxRefreshCount;
+
+	@Value("${security.jwt.password-reset-expiration}")
+	private int passwordResetExpiration;
 
 	@Override
 	public String generateToken(UserEntity user) {
@@ -81,6 +84,23 @@ public class JwtTokenServiceImpl implements IJwtTokenService {
 				.setAccessToken(token)
 				.setRefreshToken(refreshToken)
 				.setExpiration(getClaims(token).getExpiration().toInstant());
+	}
+
+	public ResetTokenDto generatePasswordResetToken(UserEntity user) {
+		Date now = new Date();
+		Date expiration = new Date(now.getTime() + passwordResetExpiration);
+
+		String resetToken = Jwts.builder()
+				.subject(user.getId().toString())
+				.claim("email", user.getEmail())
+				.claim("type", "PASSWORD_RESET")
+				.issuedAt(now)
+				.expiration(expiration)
+				.signWith(jwtKeyService.generateKey())
+				.compact();
+
+		return new ResetTokenDto()
+				.setResetToken(resetToken);
 	}
 
 	private String generateToken(UserEntity user, Long expirationTime, TokenTypeEnum tokenType) {
@@ -142,4 +162,5 @@ public class JwtTokenServiceImpl implements IJwtTokenService {
 		}
 		return null;
 	}
+
 }

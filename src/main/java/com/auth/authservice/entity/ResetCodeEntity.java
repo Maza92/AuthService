@@ -1,5 +1,6 @@
 package com.auth.authservice.entity;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
@@ -12,8 +13,20 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.Accessors;
 
-@Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@ToString
+@Accessors(chain = true)
+@Entity()
 @Table(name = "password_reset_codes")
 public class ResetCodeEntity extends BaseAuditEntity {
 
@@ -27,7 +40,7 @@ public class ResetCodeEntity extends BaseAuditEntity {
 	private String code;
 
 	@Column(name = "expires_at", nullable = false)
-	private LocalDateTime expiresAt;
+	private Instant expiresAt;
 
 	@Column(name = "attempts")
 	private Integer attempts = 0;

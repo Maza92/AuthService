@@ -11,7 +11,7 @@ import jakarta.validation.constraints.NotBlank;
 @AllArgsConstructor
 public class ForgotPasswordDto {
 
-	@NotBlank(message = "Email is required")
-	@Email(message = "Please provide a valid email address")
+	@NotBlank(message = "{validation.email.required}")
+	@Email(message = "{validation.email.format}")
 	private String email;
 }

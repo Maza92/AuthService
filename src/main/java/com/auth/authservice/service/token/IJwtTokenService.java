@@ -1,6 +1,7 @@
 package com.auth.authservice.service.token;
 
 import com.auth.authservice.dto.RefreshResponseDto;
+import com.auth.authservice.dto.ResetTokenDto;
 import com.auth.authservice.dto.LoginResponseDto;
 import com.auth.authservice.entity.UserEntity;
 
@@ -15,6 +16,8 @@ public interface IJwtTokenService {
 	LoginResponseDto generateLoginUserTokens(UserEntity user);
 
 	RefreshResponseDto generateRefreshUserTokens(UserEntity user, String refreshToken);
+
+	ResetTokenDto generatePasswordResetToken(UserEntity user);
 
 	void revokeToken(String token);
 

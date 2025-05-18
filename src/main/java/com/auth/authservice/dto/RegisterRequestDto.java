@@ -11,20 +11,20 @@ import lombok.AllArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RegisterRequestDto {
-	@Email
-	@NotBlank
+	@Email(message = "{validation.email.format}")
+	@NotBlank(message = "{validation.email.required}")
 	private String email;
 
-	@NotBlank
-	@Size(min = 8, message = "Password must be at least 8 characters long")
+	@NotBlank(message = "{validation.password.required}")
+	@Size(min = 8, message = "{validation.password.size}")
 	private String password;
 
-	@NotBlank
+	@NotBlank(message = "{validation.username.required}")
 	private String userName;
 
-	@NotBlank
+	@NotBlank(message = "{validation.firstname.required}")
 	private String firstName;
 
-	@NotBlank
+	@NotBlank(message = "{validation.lastname.required}")
 	private String lastName;
 }

@@ -10,10 +10,13 @@ import com.auth.authservice.controller.auth.IAuthController;
 import com.auth.authservice.dto.ForgotPasswordDto;
 import com.auth.authservice.dto.LoginRequestDto;
 import com.auth.authservice.dto.LoginResponseDto;
+import com.auth.authservice.dto.RecoverPasswordDto;
 import com.auth.authservice.dto.RefreshRequestDto;
 import com.auth.authservice.dto.RefreshResponseDto;
 import com.auth.authservice.dto.RegisterRequestDto;
+import com.auth.authservice.dto.ResetCodeDto;
 import com.auth.authservice.dto.ResetPasswordDto;
+import com.auth.authservice.dto.ResetTokenDto;
 import com.auth.authservice.service.auth.IAuthService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -49,11 +52,27 @@ public class AuthController implements IAuthController {
 		return ResponseEntity.ok(authService.refreshToken(refreshToken));
 	}
 
-	public ResponseEntity<Void> forgotPassword(ForgotPasswordDto request) {
+	@Override
+	public ResponseEntity<Void> forgotPassword(@Valid @RequestBody ForgotPasswordDto request) {
+		authService.forgotPassword(request);
 		return ResponseEntity.ok().build();
 	}
 
-	public ResponseEntity<Void> resetPassword(ResetPasswordDto request) {
+	@Override
+	public ResponseEntity<ResetTokenDto> verifyResetCode(@Valid @RequestBody ResetCodeDto request) {
+		return ResponseEntity.ok(authService.verifyResetCode(request));
+	}
+
+	@Override
+	public ResponseEntity<Void> recoverPassword(@Valid @RequestBody RecoverPasswordDto request) {
+		authService.recoverPassword(request);
+		return ResponseEntity.ok().build();
+	}
+
+	@Override
+	public ResponseEntity<Void> resetPassword(@Valid @RequestBody ResetPasswordDto request,
+			HttpServletRequest httpRequest) {
+		authService.resetPassword(request, httpRequest);
 		return ResponseEntity.ok().build();
 	}
 }
