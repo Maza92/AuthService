@@ -7,6 +7,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -30,6 +31,25 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class GlobalExceptionHandler {
 	private final MessageSource messageSource;
+
+	@ExceptionHandler(AuthorizationDeniedException.class)
+	public ResponseEntity<ApiErrorDto> handleAuthorizationDeniedException(
+			AuthorizationDeniedException ex, HttpServletRequest request) {
+		String message = messageSource.getMessage(
+				"exception.authorization.denied",
+				null,
+				"exception.unexpected",
+				LocaleContextHolder.getLocale());
+
+		return ResponseEntity
+				.status(HttpStatus.FORBIDDEN)
+				.body(new ApiErrorDto(
+						HttpStatus.FORBIDDEN.value(),
+						message,
+						Instant.now(),
+						request.getRequestURI(),
+						request.getMethod()));
+	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<ApiErrorDto> handleValidationExceptions(

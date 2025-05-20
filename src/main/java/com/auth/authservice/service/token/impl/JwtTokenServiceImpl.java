@@ -77,6 +77,7 @@ public class JwtTokenServiceImpl implements IJwtTokenService {
 		String token = generateToken(user);
 		String refreshToken = generateRefreshToken(user);
 		return new LoginResponseDto()
+				.setUserId(user.getId().toString())
 				.setToken(token)
 				.setRefreshToken(refreshToken)
 				.setExpiration(getClaims(token).getExpiration().toInstant())

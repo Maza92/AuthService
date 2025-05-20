@@ -8,6 +8,7 @@ import com.auth.authservice.dto.RefreshRequestDto;
 import com.auth.authservice.dto.RefreshResponseDto;
 import com.auth.authservice.dto.RegisterRequestDto;
 import com.auth.authservice.dto.ResetCodeDto;
+import com.auth.authservice.dto.ResetPasswordByAdminDto;
 import com.auth.authservice.dto.ResetPasswordDto;
 import com.auth.authservice.dto.ResetTokenDto;
 
@@ -29,4 +30,6 @@ public interface IAuthService {
 	void recoverPassword(RecoverPasswordDto request);
 
 	void resetPassword(ResetPasswordDto request, HttpServletRequest httpRequest);
+
+	void resetPasswordByAdmin(ResetPasswordByAdminDto request, Integer userId);
 }

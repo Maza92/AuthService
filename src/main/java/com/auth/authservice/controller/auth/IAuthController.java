@@ -1,6 +1,7 @@
 package com.auth.authservice.controller.auth;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -13,6 +14,7 @@ import com.auth.authservice.dto.RefreshRequestDto;
 import com.auth.authservice.dto.RefreshResponseDto;
 import com.auth.authservice.dto.RegisterRequestDto;
 import com.auth.authservice.dto.ResetCodeDto;
+import com.auth.authservice.dto.ResetPasswordByAdminDto;
 import com.auth.authservice.dto.ResetPasswordDto;
 import com.auth.authservice.dto.ResetTokenDto;
 
@@ -98,4 +100,15 @@ public interface IAuthController {
 	ResponseEntity<Void> resetPassword(
 			@Parameter(description = "Reset password request") @Valid @RequestBody ResetPasswordDto request,
 			HttpServletRequest httpRequest);
+
+	@PostMapping("/reset-password-by-admin/{userId}")
+	@Operation(summary = "Reset Password By Admin", description = "Change password for admin")
+	@ApiResponse(responseCode = "200", description = "Password reset successfully")
+	@ApiResponse(responseCode = "401", description = "Invalid credentials", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorDto.class)))
+	@ApiResponse(responseCode = "404", description = "User not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorDto.class)))
+	@AcceptLanguageHeader
+	@SecurityRequirement(name = "Auth")
+	ResponseEntity<Void> resetPasswordByAdmin(
+			@Parameter(description = "Reset password request") @Valid @RequestBody ResetPasswordByAdminDto request,
+			@Parameter(description = "User id") @PathVariable Integer userId);
 }

@@ -12,6 +12,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LoginResponseDto {
+	private String userId;
 	private String username;
 	private String token;
 	private Instant expiration;

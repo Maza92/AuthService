@@ -15,6 +15,7 @@ import com.auth.authservice.dto.RefreshRequestDto;
 import com.auth.authservice.dto.RefreshResponseDto;
 import com.auth.authservice.dto.RegisterRequestDto;
 import com.auth.authservice.dto.ResetCodeDto;
+import com.auth.authservice.dto.ResetPasswordByAdminDto;
 import com.auth.authservice.dto.ResetPasswordDto;
 import com.auth.authservice.dto.ResetTokenDto;
 import com.auth.authservice.service.auth.IAuthService;
@@ -73,6 +74,12 @@ public class AuthController implements IAuthController {
 	public ResponseEntity<Void> resetPassword(@Valid @RequestBody ResetPasswordDto request,
 			HttpServletRequest httpRequest) {
 		authService.resetPassword(request, httpRequest);
+		return ResponseEntity.ok().build();
+	}
+
+	public ResponseEntity<Void> resetPasswordByAdmin(@Valid @RequestBody ResetPasswordByAdminDto request,
+			Integer userId) {
+		authService.resetPasswordByAdmin(request, userId);
 		return ResponseEntity.ok().build();
 	}
 }

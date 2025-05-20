@@ -7,6 +7,7 @@ import java.util.Random;
 
 import org.aspectj.weaver.patterns.IToken;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,7 @@ import com.auth.authservice.dto.RefreshRequestDto;
 import com.auth.authservice.dto.RefreshResponseDto;
 import com.auth.authservice.dto.RegisterRequestDto;
 import com.auth.authservice.dto.ResetCodeDto;
+import com.auth.authservice.dto.ResetPasswordByAdminDto;
 import com.auth.authservice.dto.ResetPasswordDto;
 import com.auth.authservice.dto.ResetTokenDto;
 import com.auth.authservice.entity.ResetCodeEntity;
@@ -69,7 +71,7 @@ public class AuthService implements IAuthService {
 	public LoginResponseDto login(LoginRequestDto request) {
 
 		UserEntity user = userRepository.findByEmail(request.getEmail())
-				.orElseThrow(() -> apiExceptionFactory.authException("auth.invalid.credentials"));
+				.orElseThrow(() -> apiExceptionFactory.authException("auth.user.not.found"));
 
 		if (!user.isActive()) {
 			throw apiExceptionFactory.authException("auth.user.inactive");
@@ -218,11 +220,24 @@ public class AuthService implements IAuthService {
 				.orElseThrow(() -> apiExceptionFactory.entityNotFoundGeneric("user", userId));
 
 		if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
-			throw apiExceptionFactory.authException("auth.invalid.old.password");
+			throw apiExceptionFactory.businessException("auth.invalid.old.password");
 		}
 
 		user.setPassword(passwordEncoder.encode(request.getNewPassword()));
 		userRepository.save(user);
+	}
+
+	@Override
+	@Transactional
+	@PreAuthorize("hasRole('ADMIN')")
+	public void resetPasswordByAdmin(ResetPasswordByAdminDto request, Integer userId) {
+
+		UserEntity user = userRepository.findById(userId)
+				.orElseThrow(() -> apiExceptionFactory.entityNotFoundGeneric("user", userId));
+
+		user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+		userRepository.save(user);
+
 	}
 
 	private String generateVerificationCode() {
